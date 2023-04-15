@@ -3,6 +3,7 @@ plugins {
 	id("org.springframework.boot") version "3.1.0-M2"
 	id("io.spring.dependency-management") version "1.1.0"
 	id("org.graalvm.buildtools.native") version "0.9.20"
+    id("org.flywaydb.flyway") version "9.8.1"
 }
 
 group = "de.crfa.app"
@@ -29,7 +30,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-jooq")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.liquibase:liquibase-core")
+
+    implementation("org.flywaydb:flyway-core")
 
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("io.micrometer:micrometer-registry-prometheus")
@@ -48,4 +50,13 @@ dependencyManagement {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+task<org.flywaydb.gradle.task.FlywayMigrateTask>("init-db") {
+    url = "jdbc:h2:file:./testdb"
+    user = "sa"
+    password = "password"
+    schemas = arrayOf("dapp_metadata")
+    locations = arrayOf("filesystem: resources / db / migration")
+    baselineOnMigrate = true
 }
