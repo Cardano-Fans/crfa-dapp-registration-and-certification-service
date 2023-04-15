@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"m":"org.hsqldb.sqltool","l":"org.hsqldb.cmdline"}]

@@ -20,11 +20,11 @@ public class CrfaMetadataServiceReloadedApplication {
     public CommandLineRunner demo(ExampleRepository repository) {
         return (args) -> {
 
-//            repository.save(new Example("Jack", "Bauer"));
-//            repository.save(new Example("Chloe", "O'Brian"));
-//            repository.save(new Example("Kim", "Bauer"));
-//            repository.save(new Example("David", "Palmer"));
-//            repository.save(new Example("Michelle", "Dessler"));
+            repository.save(new Example("Jack", "Bauer"));
+            repository.save(new Example("Chloe", "O'Brian"));
+            repository.save(new Example("Kim", "Bauer"));
+            repository.save(new Example("David", "Palmer"));
+            repository.save(new Example("Michelle", "Dessler"));
 
             log.info("Example found with findAll():");
             log.info("-------------------------------");

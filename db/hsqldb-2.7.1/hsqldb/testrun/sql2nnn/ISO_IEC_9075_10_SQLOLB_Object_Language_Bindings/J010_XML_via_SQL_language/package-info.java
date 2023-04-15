@@ -1,1 +1,0 @@
-package sql2nnn.ISO_IEC_9075_10_SQLOLB_Object_Language_Bindings.J010_XML_via_SQL_language;

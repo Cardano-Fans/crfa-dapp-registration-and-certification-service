@@ -1,1 +1,0 @@
-package sql2nnn.ISO_IEC_9075_2_SQL_Foundation.F304_EXCEPT_ALL_table_operator;

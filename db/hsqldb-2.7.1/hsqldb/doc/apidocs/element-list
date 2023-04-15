@@ -1,9 +1,0 @@
-module:org.hsqldb
-org.hsqldb.auth
-org.hsqldb.jdbc
-org.hsqldb.jdbc.pool
-org.hsqldb.lib
-org.hsqldb.lib.tar
-org.hsqldb.server
-org.hsqldb.trigger
-org.hsqldb.util

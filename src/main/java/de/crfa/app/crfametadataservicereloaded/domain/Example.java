@@ -4,13 +4,12 @@ package de.crfa.app.crfametadataservicereloaded.domain;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import static jakarta.persistence.GenerationType.SEQUENCE;
+import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @Getter
@@ -19,22 +18,22 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @ToString
 public class Example {
 
-//    @GeneratedValue(strategy = AUTO)
+//    @GeneratedValue(strategy = SEQUENCE, generator = "example_gen")
+//    @SequenceGenerator(name = "example_gen", sequenceName = "example_SEQ", allocationSize = 1)
 
     @Id
-    @GeneratedValue(strategy = SEQUENCE, generator = "example_gen")
-    @SequenceGenerator(name = "example_gen", sequenceName = "example_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = AUTO)
     private Long id;
 
     private String firstname;
 
     private String lastname;
 
-    private char state = 'W';
+    private String state = "WA";
 
     protected Example() {}
 
-    public Example(String firstName, String lastname, char state) {
+    public Example(String firstName, String lastname, String state) {
         this.firstname = firstName;
         this.lastname = lastname;
         this.state = state;
