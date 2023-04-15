@@ -40,6 +40,13 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.testcontainers:junit-jupiter")
+
+    implementation("com.bloxbean.cardano:cardano-client-crypto:0.4.3")
+    implementation("com.bloxbean.cardano:cardano-client-address:0.4.3")
+    implementation("com.bloxbean.cardano:cardano-client-metadata:0.4.3")
+
+    implementation("com.google.guava:guava:31.1-jre")
+    implementation("co.nstant.in:cbor:0.9")
 }
 
 dependencyManagement {
