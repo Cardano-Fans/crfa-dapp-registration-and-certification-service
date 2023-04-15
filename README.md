@@ -1,5 +1,11 @@
 # crfa-metadata-service-reloaded
 
+## Introduction
+Reference implementation (WIP) of CIP-72 (dApp registration) and dApp Certification CIP
+
+- https://github.com/cardano-foundation/CIPs/pull/355/files
+- https://github.com/cardano-foundation/CIPs/pull/499/files
+
 ## native image
 
 Create native image (GraalVM 22.3+ is required)
