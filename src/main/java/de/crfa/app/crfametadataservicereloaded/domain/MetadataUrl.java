@@ -1,6 +1,5 @@
 package de.crfa.app.crfametadataservicereloaded.domain;
 
-
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

@@ -18,8 +18,6 @@ import java.util.List;
 @ToString
 public class DappRegistration {
 
-    // https://www.callicoder.com/hibernate-spring-boot-jpa-element-collection-demo/
-
     @Id
     private String subject;
 

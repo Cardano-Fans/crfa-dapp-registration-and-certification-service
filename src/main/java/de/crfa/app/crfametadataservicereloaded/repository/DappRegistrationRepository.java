@@ -1,12 +1,10 @@
 package de.crfa.app.crfametadataservicereloaded.repository;
 
 import de.crfa.app.crfametadataservicereloaded.domain.DappRegistration;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
-public interface DappRegistrationRepository extends CrudRepository<DappRegistration, String> {
-
-    Optional<DappRegistration> findById(String subject);
+@Repository
+public interface DappRegistrationRepository extends JpaRepository<DappRegistration, String> {
 
 }
