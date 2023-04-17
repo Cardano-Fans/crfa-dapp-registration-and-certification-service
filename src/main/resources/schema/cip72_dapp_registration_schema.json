@@ -1,0 +1,91 @@
+{
+  "$schema":"https://json-schema.org/draft/2019-09/schema",
+  "$id":"https://example.com/dApp.schema.json",
+  "title": "Cardano dApp Claim",
+  "description": "Registration of update of Cardano dApp claim.",
+  "type":"object",
+  "properties":{
+    "subject":{
+      "type":"string",
+      "description":"Identifier of the claim subject (dApp). A UTF-8 encoded string. Typically it is randomly generated hash by the dApp developer."
+    },
+    "rootHash":{
+      "type":"string",
+      "description":"blake2b hash of the metadata describing the dApp."
+    },
+    "metadata": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A valid url pointing to off-chain CIP-72 compatible metadata document.",
+        "pattern": "(https?:\/\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.\\S{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.\\S{2,}|https?:\/\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.\\S{2,}|www\\.[a-zA-Z0-9]+\\.\\S{2,})"
+      }
+    },
+    "version": {
+      "type": "string",
+      "description":"CIP version (semver).",
+      "pattern": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[a-zA-Z\\d][-a-zA-Z.\\d]*)?(\\+[a-zA-Z\\d][-a-zA-Z.\\d]*)?"
+    },
+    "type":{
+      "type":"object",
+      "description":"Describes the releases, if they are new or an updates. Also states the versioning of such releases.",
+      "properties":{
+        "action":{
+          "type":"string",
+          "enum":["REGISTER", "UPDATE", "DE_REGISTER", "DE_REGISTER_ALL"],
+          "description":"Describes the action this certificate is claiming. I.e 'REGISTER', for a new dapp; 'UPDATE' for a new release or 'DE_REGISTER' for dApp version de-listing request and DE_REGISTER_ALL if a dApp developer wants to de-register all dApp versions in one call."
+        },
+        "releaseNumber":{
+          "type":"string",
+          "description":"An official version of the release following semver format (major.minor.patch).",
+          "pattern": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[a-zA-Z\\d][-a-zA-Z.\\d]*)?(\\+[a-zA-Z\\d][-a-zA-Z.\\d]*)?"
+        },
+        "releaseName":{
+          "type":"string",
+          "description":"An optional dApp release name."
+        }
+      },
+      "required":[
+        "action",
+        "releaseNumber"
+      ]
+    },
+    "signature":{
+      "description":"Signature of the blake2b-256 hash of whole canonical (RFC 8785) JSON document (except signature property).",
+      "type":"object",
+      "properties":{
+        "r":{
+          "type":"string",
+          "description":"A hex representation of the R component of the signature.",
+          "pattern":"[0-9a-fA-F]+"
+        },
+        "s":{
+          "type":"string",
+          "description":"A hex representation of the S component of the signature.",
+          "pattern":"[0-9a-fA-F]+"
+        },
+        "algo":{
+          "const":"Ed25519−EdDSA"
+        },
+        "pub":{
+          "type":"string",
+          "description":"A hex representation of the public key.",
+          "pattern":"[0-9a-fA-F]+"
+        }
+      },
+      "required":[
+        "r",
+        "s",
+        "algo",
+        "pub"
+      ]
+    }
+  },
+  "required":[
+    "subject",
+    "rootHash",
+    "version",
+    "type",
+    "signature"
+  ]
+}

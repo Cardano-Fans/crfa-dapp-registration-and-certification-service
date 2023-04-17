@@ -50,8 +50,10 @@ dependencies {
     implementation("com.bloxbean.cardano:cardano-client-address:0.4.3")
     implementation("com.bloxbean.cardano:cardano-client-metadata:0.4.3")
 
-    implementation("com.google.guava:guava")
-    implementation("co.nstant.in:cbor")
+    implementation("com.networknt:json-schema-validator:1.0.78")
+
+    implementation("com.google.guava:guava:31.1-jre")
+    implementation("co.nstant.in:cbor:0.9")
 
     implementation("com.bloxbean.cardano:yaci-store-spring-boot-starter:0.0.6-SNAPSHOT")
     implementation("com.bloxbean.cardano:yaci-store-metadata-spring-boot-starter:0.0.6-SNAPSHOT")
