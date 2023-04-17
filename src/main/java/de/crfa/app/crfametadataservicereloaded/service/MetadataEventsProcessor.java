@@ -49,6 +49,8 @@ public class MetadataEventsProcessor {
                         var dappRegistration = objectMapper.readValue(body, DappRegistration.class);
 
                         dappRegistrationRepository.save(dappRegistration);
+                    } else {
+                        log.warn("dapp doesn't conform to the schema!");
                     }
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
