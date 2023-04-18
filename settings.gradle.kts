@@ -4,4 +4,4 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
-rootProject.name = "crfa-metadata-service-reloaded"
+rootProject.name = "crfa-dapp-registration-and-certification-service"

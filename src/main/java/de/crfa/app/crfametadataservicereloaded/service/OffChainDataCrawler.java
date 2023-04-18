@@ -10,7 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 @Component
-public class OffchainDataCrawler {
+public class OffChainDataCrawler {
 
     @Autowired
     private HttpClient httpClient;

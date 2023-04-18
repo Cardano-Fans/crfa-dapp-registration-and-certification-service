@@ -24,10 +24,10 @@ import java.util.Set;
 
 @Component
 @Slf4j
-public class MetadataEventsProcessor {
+public class OnChainRegistrationEventsProcessor {
 
     @Autowired
-    private DappRegistrationEventRepository dappRegistrationRepository;
+    private DappRegistrationEventRepository dappRegistrationEventRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -50,11 +50,13 @@ public class MetadataEventsProcessor {
 
                 try {
                     if (validateSchema(body)) {
-                        var dappRegistration = objectMapper.readValue(body, OnchainDappRegistrationEvent.class);
+                        var onchainDappRegistrationEvent = objectMapper.readValue(body, OnchainDappRegistrationEvent.class);
 
-                        dappRegistrationRepository.save(dappRegistration);
+                        dappRegistrationEventRepository.save(onchainDappRegistrationEvent);
                     } else {
-                        log.warn("dapp doesn't conform to the schema!");
+                        // TODO we need to store to db table which marks errors
+                        // typical dead queue pattern
+                        log.warn("dapp registration doesn't conform to the schema!");
                     }
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);

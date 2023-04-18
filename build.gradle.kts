@@ -25,6 +25,7 @@ repositories {
 extra["testcontainersVersion"] = "1.17.6"
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-cache")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-data-rest")

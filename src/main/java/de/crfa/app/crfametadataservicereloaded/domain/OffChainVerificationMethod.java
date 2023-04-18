@@ -10,7 +10,7 @@ import lombok.ToString;
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 @ToString
-public class OffchainVerificationMethod {
+public class OffChainVerificationMethod {
 
     @NotBlank
     private Method method;

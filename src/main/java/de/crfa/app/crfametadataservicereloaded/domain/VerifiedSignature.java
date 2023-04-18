@@ -22,10 +22,10 @@ public class VerifiedSignature {
     @Column(name = "verified_by")
     private String verifiedBy;
 
-    @ElementCollection(targetClass = OffchainVerificationMethod.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = OffChainVerificationMethod.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "offchain_verification_method", joinColumns = @JoinColumn(name = "signature_pub"))
     @Column(name = "verified_methods")
     @NotBlank
-    private Collection<OffchainVerificationMethod> verifiedMethods;
+    private Collection<OffChainVerificationMethod> verifiedMethods;
 
 }
