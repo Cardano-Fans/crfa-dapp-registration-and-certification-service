@@ -1,6 +1,7 @@
 package de.crfa.app.crfametadataservicereloaded.domain;
 
 
+import de.crfa.app.crfametadataservicereloaded.utils.Patterns;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,12 +17,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class DappRegistration {
+public class OnchainDappRegistrationEvent {
 
     @Id
+    @Column(name = "subject", nullable = false)
     private String subject;
 
     @Column(name = "root_hash")
+    @Pattern(regexp = Patterns.HEX)
     @NotBlank
     private String rootHash;
 
@@ -36,7 +39,7 @@ public class DappRegistration {
 
     @NotBlank
     @Column(name = "release_number")
-    @Pattern(regexp = "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[a-zA-Z\\d][-a-zA-Z.\\d]*)?(\\+[a-zA-Z\\d][-a-zA-Z.\\d]*)?")
+    @Pattern(regexp = Patterns.RELEASE_NAME)
     private String releaseNumber;
 
     @Column(name = "release_name")
@@ -44,12 +47,12 @@ public class DappRegistration {
 
     @Column(name = "signature_r")
     @NotBlank
-    @Pattern(regexp = "[0-9a-fA-F]+")
+    @Pattern(regexp = Patterns.HEX)
     private String signatureR;
 
     @Column(name = "signature_s")
     @NotBlank
-    @Pattern(regexp = "[0-9a-fA-F]+")
+    @Pattern(regexp = Patterns.HEX)
     private String signatureS;
 
     @Column(name = "signature_algo")
@@ -59,7 +62,7 @@ public class DappRegistration {
 
     @Column(name = "signature_pub")
     @NotBlank
-    @Pattern(regexp = "[0-9a-fA-F]+")
+    @Pattern(regexp = Patterns.HEX)
     private String signaturePub;
 
 }

@@ -9,8 +9,8 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
-import de.crfa.app.crfametadataservicereloaded.domain.DappRegistration;
-import de.crfa.app.crfametadataservicereloaded.repository.DappRegistrationRepository;
+import de.crfa.app.crfametadataservicereloaded.domain.OnchainDappRegistrationEvent;
+import de.crfa.app.crfametadataservicereloaded.repository.DappRegistrationEventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +19,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 @Component
@@ -27,7 +27,7 @@ import java.util.Set;
 public class MetadataEventsProcessor {
 
     @Autowired
-    private DappRegistrationRepository dappRegistrationRepository;
+    private DappRegistrationEventRepository dappRegistrationRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -37,16 +37,20 @@ public class MetadataEventsProcessor {
 
     @EventListener
     public void onTxMetadataEvent(TxMetadataEvent event) {
-        log.info("TxMetadataEvent: {}", event);
+        //log.info("TxMetadataEvent: {}", event);
 
         event.getTxMetadataList().forEach(txMetadataLabel -> {
+
+            if (txMetadataLabel.getLabel().equalsIgnoreCase("674")) {
+                log.info("Label:" + txMetadataLabel.getBody());
+            }
 
             if (txMetadataLabel.getLabel().equalsIgnoreCase("1666")) {
                 var body = txMetadataLabel.getBody();
 
                 try {
                     if (validateSchema(body)) {
-                        var dappRegistration = objectMapper.readValue(body, DappRegistration.class);
+                        var dappRegistration = objectMapper.readValue(body, OnchainDappRegistrationEvent.class);
 
                         dappRegistrationRepository.save(dappRegistration);
                     } else {
@@ -64,7 +68,7 @@ public class MetadataEventsProcessor {
             JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
 
             JsonSchema jsonSchema = factory.getSchema(
-                    dappRegistrationSchema.getContentAsString(Charset.defaultCharset()));
+                    dappRegistrationSchema.getContentAsString(StandardCharsets.UTF_8));
 
             JsonNode jsonNode = objectMapper.readTree(body);
 
