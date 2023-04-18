@@ -1,4 +1,4 @@
-# crfa-metadata-service-reloaded
+# crfa-dapp-registration-and-certification-service
 
 ## Introduction
 Reference implementation (WIP) of CIP-72 (dApp registration) and dApp Certification CIP
