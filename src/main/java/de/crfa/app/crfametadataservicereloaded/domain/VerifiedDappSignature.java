@@ -16,8 +16,20 @@ import java.util.Collection;
 public class VerifiedSignature {
 
     @Id
-    @Column(name = "signature_pub")
-    private String signaturePub;
+    @Column(name = "signature")
+    private String signature;
+
+    @Column(name = "pub_key")
+    private String pubKey;
+
+    // we verify that blake2b signature is valid or not
+    // this process is fully auttmated
+    @Column(name = "automated_check_pass")
+    private Boolean automatedCheckPass;
+
+    // we checked that pub_key indeed belongs to the dApp claiming it
+    @Column(name = "manual_check_pass")
+    private Boolean manualCheckPass;
 
     @Column(name = "verified_by")
     private String verifiedBy;
