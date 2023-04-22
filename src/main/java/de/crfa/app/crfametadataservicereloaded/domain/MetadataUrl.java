@@ -1,20 +1,28 @@
 package de.crfa.app.crfametadataservicereloaded.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Embeddable
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 @ToString
+@Getter
+@Setter
 public class MetadataUrl {
 
     @NotBlank
-    @Pattern(regexp = "(https?://(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.\\S{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.\\S{2,}|https?://(?:www\\.|(?!www))[a-zA-Z0-9]+\\.\\S{2,}|www\\.[a-zA-Z0-9]+\\.\\S{2,})")
+    @Column(name = "url")
     private String url;
+
+    @NotBlank
+    @Column(name = "type")
+    private MetadataType type;
+
+    public enum MetadataType {
+        UNKNOWN, HTTP, IPFS
+    }
 
 }

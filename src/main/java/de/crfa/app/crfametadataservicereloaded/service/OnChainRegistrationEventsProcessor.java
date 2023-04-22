@@ -9,7 +9,8 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
-import de.crfa.app.crfametadataservicereloaded.domain.OnchainDappRegistrationEvent;
+import de.crfa.app.crfametadataservicereloaded.domain.*;
+import de.crfa.app.crfametadataservicereloaded.repository.DappRegistrationEventFailureRepository;
 import de.crfa.app.crfametadataservicereloaded.repository.DappRegistrationEventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Component
 @Slf4j
@@ -30,7 +32,13 @@ public class OnChainRegistrationEventsProcessor {
     private DappRegistrationEventRepository dappRegistrationEventRepository;
 
     @Autowired
+    private DappRegistrationEventFailureRepository dappRegistrationEventFailureRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private OffchainMetadataProcessor offchainMetadataProcessor;
 
     @Value("classpath:schema/cip72_dapp_registration_schema.json")
     private Resource dappRegistrationSchema;
@@ -49,17 +57,55 @@ public class OnChainRegistrationEventsProcessor {
                 var body = txMetadataLabel.getBody();
 
                 try {
-                    if (validateSchema(body)) {
-                        var onchainDappRegistrationEvent = objectMapper.readValue(body, OnchainDappRegistrationEvent.class);
+                    String blockHash = event.getEventMetadata().getBlockHash();
+                    long slot = event.getEventMetadata().getSlot();
+                    JsonNode node = objectMapper.readTree(body);
+                    String subject = node.get("subject").asText(null);
+                    if (subject == null) {
+                        // catastrophic
+                        log.error("error processing");
+                        return;
+                    }
 
-                        dappRegistrationEventRepository.save(onchainDappRegistrationEvent);
+                    if (validateSchema(body)) {
+                        var onChainDappRegistrationEvent = new OnChainDappRegistrationEvent();
+                        var id = new OnChainDappRegistrationEventId(slot, blockHash, subject);
+
+                        onChainDappRegistrationEvent.setId(id);
+                        onChainDappRegistrationEvent.setRootHash(node.get("rootHash").asText());
+                        JsonNode typeNode = node.get("type");
+
+                        onChainDappRegistrationEvent.setActionType(ActionType.valueOf(typeNode.get("action").asText()));
+
+                        if (typeNode.has("releaseNumber")) {
+                            onChainDappRegistrationEvent.setReleaseNumber(typeNode.get("releaseNumber").asText());
+                        }
+                        if (typeNode.has("releaseName")) {
+                            onChainDappRegistrationEvent.setReleaseName(typeNode.get("releaseName").asText());
+                        }
+
+                        JsonNode signature = node.get("signature");
+
+                        onChainDappRegistrationEvent.setSignatureS(signature.get("s").asText());
+                        onChainDappRegistrationEvent.setSignatureR(signature.get("r").asText());
+                        onChainDappRegistrationEvent.setSignaturePub(signature.get("pub").asText());
+
+                        dappRegistrationEventRepository.saveAndFlush(onChainDappRegistrationEvent);
+
+                        // fire up async off-chain crawler
+                        offchainMetadataProcessor.process(onChainDappRegistrationEvent);
                     } else {
-                        // TODO we need to store to db table which marks errors
-                        // typical dead queue pattern
-                        log.warn("dapp registration doesn't conform to the schema!");
+                        var id = new OnChainDappRegistrationFailureEventId(slot, blockHash);
+                        var onChainDappRegistrationFailureEvent = new OnChainDappRegistrationEventFailure();
+                        onChainDappRegistrationFailureEvent.setId(id);
+                        onChainDappRegistrationFailureEvent.setBody(body);
+
+                        dappRegistrationEventFailureRepository.saveAndFlush(onChainDappRegistrationFailureEvent);
+
+                        log.warn("Dapp registration doesn't conform to the schema, logging failure, entry: {}", onChainDappRegistrationFailureEvent);
                     }
                 } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                    log.error("JSON processing error", e);
                 }
             }
         });
@@ -70,7 +116,7 @@ public class OnChainRegistrationEventsProcessor {
             JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
 
             JsonSchema jsonSchema = factory.getSchema(
-                    dappRegistrationSchema.getContentAsString(StandardCharsets.UTF_8));
+                    dappRegistrationSchema.getContentAsString(UTF_8));
 
             JsonNode jsonNode = objectMapper.readTree(body);
 

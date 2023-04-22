@@ -32,7 +32,6 @@ dependencies {
 	//implementation("org.springframework.boot:spring-boot-starter-jooq")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-json")
 
     implementation("org.flywaydb:flyway-core")
 
@@ -51,6 +50,8 @@ dependencies {
     implementation("com.bloxbean.cardano:cardano-client-address:0.4.3")
     implementation("com.bloxbean.cardano:cardano-client-metadata:0.4.3")
 
+    // for canonical json support in jackson -> https://github.com/setl/canonical-json
+    implementation("io.setl:canonical-json:2.3")
     implementation("com.networknt:json-schema-validator:1.0.78")
 
     implementation("com.google.guava:guava:31.1-jre")

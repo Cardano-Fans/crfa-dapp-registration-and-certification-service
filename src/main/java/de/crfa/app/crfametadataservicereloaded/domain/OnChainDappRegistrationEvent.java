@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +18,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class OnchainDappRegistrationEvent {
+public class OnChainDappRegistrationEvent extends AbstractTimestampEntity {
 
-    @Id
-    @Column(name = "subject", nullable = false)
-    private String subject;
+    @EmbeddedId
+    private OnChainDappRegistrationEventId id;
 
     @Column(name = "root_hash")
-    @Pattern(regexp = Patterns.HEX)
+    @Pattern(regexp = Patterns.HEX_32_64)
     @NotBlank
     private String rootHash;
 
@@ -37,9 +37,13 @@ public class OnchainDappRegistrationEvent {
     @Column(name = "action_type")
     private ActionType actionType;
 
-    @NotBlank
+//    @Column(name = "version")
+//    @NotBlank
+//    private String version;
+
     @Column(name = "release_number")
-    @Pattern(regexp = Patterns.RELEASE_NAME)
+    @Pattern(regexp = Patterns.RELEASE_VERSION)
+    @Nullable
     private String releaseNumber;
 
     @Column(name = "release_name")
@@ -47,12 +51,12 @@ public class OnchainDappRegistrationEvent {
 
     @Column(name = "signature_r")
     @NotBlank
-    @Pattern(regexp = Patterns.HEX)
+    @Pattern(regexp = Patterns.HEX_32_64)
     private String signatureR;
 
     @Column(name = "signature_s")
     @NotBlank
-    @Pattern(regexp = Patterns.HEX)
+    @Pattern(regexp = Patterns.HEX_32_64)
     private String signatureS;
 
     @Column(name = "signature_algo")
@@ -62,7 +66,7 @@ public class OnchainDappRegistrationEvent {
 
     @Column(name = "signature_pub")
     @NotBlank
-    @Pattern(regexp = Patterns.HEX)
+    @Pattern(regexp = Patterns.HEX_32_64)
     private String signaturePub;
 
 }

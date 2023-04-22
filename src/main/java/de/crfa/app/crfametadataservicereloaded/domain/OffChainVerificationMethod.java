@@ -16,7 +16,7 @@ public class OffChainVerificationMethod {
     private Method method;
 
     public enum Method {
-        DISCORD, TWITTER
+        DISCORD, TWITTER, PHOME
     }
 
 }

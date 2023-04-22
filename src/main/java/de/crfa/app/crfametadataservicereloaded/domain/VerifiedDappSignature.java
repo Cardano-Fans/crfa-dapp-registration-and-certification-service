@@ -13,7 +13,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class VerifiedSignature {
+public class VerifiedDappSignature {
 
     @Id
     @Column(name = "signature")
@@ -23,14 +23,16 @@ public class VerifiedSignature {
     private String pubKey;
 
     // we verify that blake2b signature is valid or not
-    // this process is fully auttmated
+    // this process will be fully automated
     @Column(name = "automated_check_pass")
     private Boolean automatedCheckPass;
 
     // we checked that pub_key indeed belongs to the dApp claiming it
+    // this process is manual and requires usage of verifiedMethods
     @Column(name = "manual_check_pass")
     private Boolean manualCheckPass;
 
+    // actor / person that verified this public key (manual part)
     @Column(name = "verified_by")
     private String verifiedBy;
 
