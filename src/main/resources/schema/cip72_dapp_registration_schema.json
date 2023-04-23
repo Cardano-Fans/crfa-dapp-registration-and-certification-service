@@ -1,30 +1,38 @@
 {
-  "$schema":"https://json-schema.org/draft/2019-09/schema",
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
   "$id":"https://example.com/dApp.schema.json",
   "title": "Cardano dApp Claim",
-  "description": "Registration of update of Cardano dApp claim.",
+  "description": "Registration of Cardano dApp claim.",
   "type":"object",
   "properties":{
     "subject":{
       "type":"string",
-      "description":"Identifier of the claim subject (dApp). A UTF-8 encoded string. Typically it is randomly generated hash by the dApp developer."
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern":"^[0-9a-fA-F]{64}$",
+      "description":"Identifier of the claim subject (dApp). A UTF-8 encoded string, must be 64 chars. Typically it is randomly generated hash by the dApp developer."
     },
     "rootHash":{
       "type":"string",
-      "description":"blake2b hash of the metadata describing the dApp."
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern":"^[0-9a-fA-F]{64}$",
+      "description":"blake2b-256 hash of the metadata describing the off-chain part of the dApp."
     },
     "metadata": {
       "type": "array",
+      "description": "An array of valid URLs pointing to off-chain CIP-72 compatible metadata document. If an individual URL is longer than 64 characters, it must be expressed as an array of strings (where each string may contain at most 64 characters).",
       "items": {
-        "type": "string",
-        "description": "A valid url pointing to off-chain CIP-72 compatible metadata document.",
-        "pattern": "(https?:\/\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.\\S{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.\\S{2,}|https?:\/\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.\\S{2,}|www\\.[a-zA-Z0-9]+\\.\\S{2,})"
+        "anyOf": [{
+          "type": "string"
+        }, {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }],
+        "examples": ["https://raw.githubusercontent.com/org/repo/offchain.json", ["https://raw.githubusercontent.com/long-org-name/", "long-repo-name/offchain.json"], "ipfs://QmbQDvKJeo2NgGcGdnUiUFibTzuKNK5Uij7jzmK8ZccmWp", ["ipfs://QmbQDvKJeo2NgGcGdnUiaAdADA", "UFibTzuKNKc0jA390alDAD5Uij7jzmK8ZccmWp"]]
       }
-    },
-    "version": {
-      "type": "string",
-      "description":"CIP version (semver).",
-      "pattern": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[a-zA-Z\\d][-a-zA-Z.\\d]*)?(\\+[a-zA-Z\\d][-a-zA-Z.\\d]*)?"
     },
     "type":{
       "type":"object",
@@ -32,22 +40,13 @@
       "properties":{
         "action":{
           "type":"string",
-          "enum":["REGISTER", "UPDATE", "DE_REGISTER", "DE_REGISTER_ALL"],
-          "description":"Describes the action this certificate is claiming. I.e 'REGISTER', for a new dapp; 'UPDATE' for a new release or 'DE_REGISTER' for dApp version de-listing request and DE_REGISTER_ALL if a dApp developer wants to de-register all dApp versions in one call."
-        },
-        "releaseNumber":{
-          "type":"string",
-          "description":"An official version of the release following semver format (major.minor.patch).",
-          "pattern": "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[a-zA-Z\\d][-a-zA-Z.\\d]*)?(\\+[a-zA-Z\\d][-a-zA-Z.\\d]*)?"
-        },
-        "releaseName":{
-          "type":"string",
-          "description":"An optional dApp release name."
+          "enum":["REGISTER", "DE_REGISTER"],
+          "pattern": "^(REGISTER|DE_REGISTER)$",
+          "description":"Describes the action this certificate is claiming; i.e 'REGISTER', for a new dApp or an update, DE_REGISTER for asserting that the dApp's development is stopped, and it is deprecated. So, no further dApp's on-chain update is to be expected."
         }
       },
       "required":[
-        "action",
-        "releaseNumber"
+        "action"
       ]
     },
     "signature":{
@@ -57,12 +56,16 @@
         "r":{
           "type":"string",
           "description":"A hex representation of the R component of the signature.",
-          "pattern":"[0-9a-fA-F]+"
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern":"^[0-9a-fA-F]{64}$"
         },
         "s":{
           "type":"string",
           "description":"A hex representation of the S component of the signature.",
-          "pattern":"[0-9a-fA-F]+"
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern":"^[0-9a-fA-F]{64}$"
         },
         "algo":{
           "const":"Ed25519−EdDSA"
@@ -70,7 +73,9 @@
         "pub":{
           "type":"string",
           "description":"A hex representation of the public key.",
-          "pattern":"[0-9a-fA-F]+"
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern":"^[0-9a-fA-F]{64}$"
         }
       },
       "required":[
@@ -84,7 +89,6 @@
   "required":[
     "subject",
     "rootHash",
-    "version",
     "type",
     "signature"
   ]

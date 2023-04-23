@@ -1,4 +1,4 @@
-package de.crfa.app.crfametadataservicereloaded.domain;
+package de.crfa.app.crfametadataservicereloaded.domain.exp;
 
 
 import jakarta.persistence.*;
@@ -36,10 +36,10 @@ public class VerifiedDappSignature {
     @Column(name = "verified_by")
     private String verifiedBy;
 
-    @ElementCollection(targetClass = OffChainVerificationMethod.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = StoreVerificationMethod.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "offchain_verification_method", joinColumns = @JoinColumn(name = "signature_pub"))
     @Column(name = "verified_methods")
     @NotBlank
-    private Collection<OffChainVerificationMethod> verifiedMethods;
+    private Collection<StoreVerificationMethod> verifiedMethods;
 
 }

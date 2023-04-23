@@ -5,6 +5,7 @@ import com.bloxbean.cardano.yaci.store.metadata.domain.TxMetadataEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
@@ -20,14 +21,18 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import static de.crfa.app.crfametadataservicereloaded.domain.MetadataUrl.MetadataType.HTTP_FAMILY;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Component
 @Slf4j
 public class OnChainRegistrationEventsProcessor {
 
+    public static final String DAPP_REGISTRATION_METADATA_LABEL = "1666";
     @Autowired
     private DappRegistrationEventRepository dappRegistrationEventRepository;
 
@@ -49,31 +54,28 @@ public class OnChainRegistrationEventsProcessor {
 
         event.getTxMetadataList().forEach(txMetadataLabel -> {
 
-            if (txMetadataLabel.getLabel().equalsIgnoreCase("674")) {
-                log.info("Label:" + txMetadataLabel.getBody());
-            }
+//            if (txMetadataLabel.getLabel().equalsIgnoreCase("674")) {
+//                log.info("Label:" + txMetadataLabel.getBody());
+//            }
 
-            if (txMetadataLabel.getLabel().equalsIgnoreCase("1666")) {
+            if (txMetadataLabel.getLabel().equalsIgnoreCase(DAPP_REGISTRATION_METADATA_LABEL)) {
                 var body = txMetadataLabel.getBody();
 
                 try {
                     String blockHash = event.getEventMetadata().getBlockHash();
                     long slot = event.getEventMetadata().getSlot();
-                    JsonNode node = objectMapper.readTree(body);
-                    String subject = node.get("subject").asText(null);
-                    if (subject == null) {
-                        // catastrophic
-                        log.error("error processing");
-                        return;
-                    }
+                    JsonNode root = objectMapper.readTree(body);
 
                     if (validateSchema(body)) {
+                        String subject = root.get("subject").asText();
+
                         var onChainDappRegistrationEvent = new OnChainDappRegistrationEvent();
                         var id = new OnChainDappRegistrationEventId(slot, blockHash, subject);
 
                         onChainDappRegistrationEvent.setId(id);
-                        onChainDappRegistrationEvent.setRootHash(node.get("rootHash").asText());
-                        JsonNode typeNode = node.get("type");
+                        onChainDappRegistrationEvent.setRootHash(root.get("rootHash").asText());
+
+                        JsonNode typeNode = root.get("type");
 
                         onChainDappRegistrationEvent.setActionType(ActionType.valueOf(typeNode.get("action").asText()));
 
@@ -84,11 +86,12 @@ public class OnChainRegistrationEventsProcessor {
                             onChainDappRegistrationEvent.setReleaseName(typeNode.get("releaseName").asText());
                         }
 
-                        JsonNode signature = node.get("signature");
+                        JsonNode signature = root.get("signature");
 
                         onChainDappRegistrationEvent.setSignatureS(signature.get("s").asText());
                         onChainDappRegistrationEvent.setSignatureR(signature.get("r").asText());
                         onChainDappRegistrationEvent.setSignaturePub(signature.get("pub").asText());
+                        onChainDappRegistrationEvent.setMetadataUrls(convertUrls(root));
 
                         dappRegistrationEventRepository.saveAndFlush(onChainDappRegistrationEvent);
 
@@ -128,6 +131,54 @@ public class OnChainRegistrationEventsProcessor {
 
             return false;
         }
+    }
+
+    private List<MetadataUrl> convertUrls(JsonNode root) {
+        ArrayNode metadataNode = (ArrayNode) root.get("metadata");
+
+        List<MetadataUrl> urls = new ArrayList<>();
+
+        if (detectArrayItem(metadataNode)) {
+            StringBuilder sb = new StringBuilder();
+            for (JsonNode urlPartJsonNode : metadataNode) {
+                String urlPart = urlPartJsonNode.asText();
+                sb.append(urlPart);
+            }
+            String fullUrl = sb.toString();
+            if (isHttpAlike(fullUrl)) {
+                urls.add(MetadataUrl.of(fullUrl, HTTP_FAMILY));
+            }
+        }
+        if (detectStringItem(metadataNode)) {
+            for (JsonNode urlNode : metadataNode) {
+                String url = urlNode.asText();
+                if (isHttpAlike(url)) {
+                    urls.add(MetadataUrl.of(url, HTTP_FAMILY));
+                }
+            }
+        }
+
+        return urls;
+    }
+
+    private static boolean isHttpAlike(String fullUrl) {
+        return fullUrl.startsWith("http") || fullUrl.startsWith("https");
+    }
+
+    private boolean detectArrayItem(ArrayNode metadataNode) {
+        if (metadataNode.isEmpty()) {
+            return false;
+        }
+
+        return metadataNode.iterator().next().isArray();
+    }
+
+    private boolean detectStringItem(ArrayNode metadataNode) {
+        if (metadataNode.isEmpty()) {
+            return false;
+        }
+
+        return metadataNode.iterator().next().isTextual();
     }
 
 }

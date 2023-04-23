@@ -12,6 +12,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.EAGER;
+
 @Entity
 @Getter
 @Setter
@@ -28,8 +30,8 @@ public class OnChainDappRegistrationEvent extends AbstractTimestampEntity {
     @NotBlank
     private String rootHash;
 
-    @ElementCollection(targetClass = MetadataUrl.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "metadata_urls", joinColumns = @JoinColumn(name = "subject"))
+    @ElementCollection(targetClass = MetadataUrl.class, fetch = EAGER)
+    @CollectionTable(name = "metadata_urls", joinColumns = { @JoinColumn(name = "slot"), @JoinColumn(name = "block_hash"), @JoinColumn(name = "subject") } )
     @Column(name = "metadata_url")
     private List<MetadataUrl> metadataUrls = new ArrayList<>();
 
@@ -37,16 +39,13 @@ public class OnChainDappRegistrationEvent extends AbstractTimestampEntity {
     @Column(name = "action_type")
     private ActionType actionType;
 
-//    @Column(name = "version")
-//    @NotBlank
-//    private String version;
-
     @Column(name = "release_number")
     @Pattern(regexp = Patterns.RELEASE_VERSION)
     @Nullable
     private String releaseNumber;
 
     @Column(name = "release_name")
+    @Nullable
     private String releaseName;
 
     @Column(name = "signature_r")

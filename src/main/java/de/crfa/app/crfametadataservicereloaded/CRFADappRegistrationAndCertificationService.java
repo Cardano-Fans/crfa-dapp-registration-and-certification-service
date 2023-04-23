@@ -29,10 +29,10 @@ import java.util.concurrent.Executor;
 @EnableScheduling
 @EnableAsync
 @Slf4j
-public class CrfaMetadataServiceReloadedApplication {
+public class CRFADappRegistrationAndCertificationService {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CrfaMetadataServiceReloadedApplication.class, args);
+		SpringApplication.run(CRFADappRegistrationAndCertificationService.class, args);
 	}
 
     @Bean(name = "threadPoolTaskExecutor")
@@ -64,11 +64,11 @@ public class CrfaMetadataServiceReloadedApplication {
                 .connectTimeout(Duration.ofSeconds(20))
                 .build();
     }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper(new CanonicalFactory());
-    }
+//
+//    @Bean("canonical_object_mapper")
+//    public ObjectMapper objectMapper() {
+//        return new ObjectMapper(new CanonicalFactory());
+//    }
 
 //    @Bean
 //    public CommandLineRunner demo(DappRegistrationRepository repository) {

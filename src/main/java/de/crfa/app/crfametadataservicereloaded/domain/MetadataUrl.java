@@ -22,7 +22,7 @@ public class MetadataUrl {
     private MetadataType type;
 
     public enum MetadataType {
-        UNKNOWN, HTTP, IPFS
+        HTTP_FAMILY, IPFS_FAMILY
     }
 
 }

@@ -1,4 +1,4 @@
-package de.crfa.app.crfametadataservicereloaded.domain;
+package de.crfa.app.crfametadataservicereloaded.domain.exp;
 
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
@@ -10,13 +10,13 @@ import lombok.ToString;
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 @ToString
-public class OffChainVerificationMethod {
+public class StoreVerificationMethod {
 
     @NotBlank
     private Method method;
 
     public enum Method {
-        DISCORD, TWITTER, PHOME
+        DISCORD, TWITTER, PHONE
     }
 
 }
