@@ -32,7 +32,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 public class OnChainRegistrationEventsProcessor {
 
-    public static final String DAPP_REGISTRATION_METADATA_LABEL = "1666";
+    private static final String DAPP_REGISTRATION_METADATA_LABEL = "1666";
+
     @Autowired
     private DappRegistrationEventRepository dappRegistrationEventRepository;
 

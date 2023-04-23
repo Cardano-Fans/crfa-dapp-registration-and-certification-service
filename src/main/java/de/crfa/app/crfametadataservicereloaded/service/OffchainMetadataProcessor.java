@@ -11,6 +11,7 @@ import io.setl.json.jackson.CanonicalFactory;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -25,11 +26,14 @@ public class OffchainMetadataProcessor {
 
     @Autowired
     private RawOffchainDAppRepository rawOffchainDAppRepository;
+
+    @Autowired
+    @Qualifier("canonical_object_mapper")
     private ObjectMapper canonicalObjectMapper;
 
     @PostConstruct
     public void init() {
-        this.canonicalObjectMapper = canonicalMapper();
+        //this.canonicalObjectMapper = canonicalMapper();
     }
 
     @Async("threadPoolTaskExecutor")
@@ -55,7 +59,7 @@ public class OffchainMetadataProcessor {
                     rawOffchainDApp.setBody(body);
                     rawOffchainDApp.setCanonicalBody(canonicalJson);
 
-                    rawOffchainDAppRepository.save(rawOffchainDApp);
+                    rawOffchainDAppRepository.saveAndFlush(rawOffchainDApp);
                 } catch (Exception e) {
                     log.warn("Crawling error, url:{}", metadataUrl.getUrl(), e);
                 }
