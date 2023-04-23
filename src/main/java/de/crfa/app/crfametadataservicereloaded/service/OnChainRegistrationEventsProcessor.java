@@ -62,9 +62,10 @@ public class OnChainRegistrationEventsProcessor {
             if (txMetadataLabel.getLabel().equalsIgnoreCase(DAPP_REGISTRATION_METADATA_LABEL)) {
                 var body = txMetadataLabel.getBody();
 
+                String blockHash = event.getEventMetadata().getBlockHash();
+                long slot = event.getEventMetadata().getSlot();
+
                 try {
-                    String blockHash = event.getEventMetadata().getBlockHash();
-                    long slot = event.getEventMetadata().getSlot();
                     JsonNode root = objectMapper.readTree(body);
 
                     if (validateSchema(body)) {
@@ -99,20 +100,24 @@ public class OnChainRegistrationEventsProcessor {
                         // fire up async off-chain crawler
                         offchainMetadataProcessor.process(onChainDappRegistrationEvent);
                     } else {
-                        var id = new OnChainDappRegistrationFailureEventId(slot, blockHash);
-                        var onChainDappRegistrationFailureEvent = new OnChainDappRegistrationEventFailure();
-                        onChainDappRegistrationFailureEvent.setId(id);
-                        onChainDappRegistrationFailureEvent.setBody(body);
-
-                        dappRegistrationEventFailureRepository.saveAndFlush(onChainDappRegistrationFailureEvent);
-
-                        log.warn("Dapp registration doesn't conform to the schema, logging failure, entry: {}", onChainDappRegistrationFailureEvent);
+                        log.warn("dApp RegistrationEvent schema validation error, blockHash:{}, slot:{}", blockHash, slot);
+                        handleError(body, blockHash, slot);
                     }
                 } catch (JsonProcessingException e) {
-                    log.error("JSON processing error", e);
+                    log.warn("dApp RegistrationEvent JSON processing error, blockHash: {}, slot:{}", blockHash, slot, e);
+                    handleError(body, blockHash, slot);
                 }
             }
         });
+    }
+
+    private void handleError(String body, String blockHash, long slot) {
+        var id = new OnChainDappRegistrationFailureEventId(slot, blockHash);
+        var onChainDappRegistrationFailureEvent = new OnChainDappRegistrationEventFailure();
+        onChainDappRegistrationFailureEvent.setId(id);
+        onChainDappRegistrationFailureEvent.setBody(body);
+
+        dappRegistrationEventFailureRepository.saveAndFlush(onChainDappRegistrationFailureEvent);
     }
 
     private boolean validateSchema(String body) {
