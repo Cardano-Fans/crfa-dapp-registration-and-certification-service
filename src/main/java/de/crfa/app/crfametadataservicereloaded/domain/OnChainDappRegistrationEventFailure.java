@@ -22,4 +22,12 @@ public class OnChainDappRegistrationEventFailure {
     @NotNull
     private String body;
 
+    @Column(name = "failure_type")
+    @NotNull
+    private FailureType failureType;
+
+    public enum FailureType {
+        JSON_PARSING_ERROR, SCHEMA_ERROR
+    }
+
 }

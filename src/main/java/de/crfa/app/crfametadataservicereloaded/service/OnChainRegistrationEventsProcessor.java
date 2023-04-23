@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Set;
 
 import static de.crfa.app.crfametadataservicereloaded.domain.MetadataUrl.MetadataType.HTTP_FAMILY;
+import static de.crfa.app.crfametadataservicereloaded.domain.OnChainDappRegistrationEventFailure.FailureType.JSON_PARSING_ERROR;
+import static de.crfa.app.crfametadataservicereloaded.domain.OnChainDappRegistrationEventFailure.FailureType.SCHEMA_ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Component
@@ -101,21 +103,22 @@ public class OnChainRegistrationEventsProcessor {
                         offchainMetadataProcessor.process(onChainDappRegistrationEvent);
                     } else {
                         log.warn("dApp RegistrationEvent schema validation error, blockHash:{}, slot:{}", blockHash, slot);
-                        handleError(body, blockHash, slot);
+                        handleError(body, blockHash, slot, SCHEMA_ERROR);
                     }
                 } catch (JsonProcessingException e) {
                     log.warn("dApp RegistrationEvent JSON processing error, blockHash: {}, slot:{}", blockHash, slot, e);
-                    handleError(body, blockHash, slot);
+                    handleError(body, blockHash, slot, JSON_PARSING_ERROR);
                 }
             }
         });
     }
 
-    private void handleError(String body, String blockHash, long slot) {
+    private void handleError(String body, String blockHash, long slot, OnChainDappRegistrationEventFailure.FailureType failureType) {
         var id = new OnChainDappRegistrationFailureEventId(slot, blockHash);
         var onChainDappRegistrationFailureEvent = new OnChainDappRegistrationEventFailure();
         onChainDappRegistrationFailureEvent.setId(id);
         onChainDappRegistrationFailureEvent.setBody(body);
+        onChainDappRegistrationFailureEvent.setFailureType(failureType);
 
         dappRegistrationEventFailureRepository.saveAndFlush(onChainDappRegistrationFailureEvent);
     }
