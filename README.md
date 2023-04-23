@@ -15,7 +15,7 @@ $ ./gradlew nativeCompile
 
 then, you can run the app as follows:
 ```
-$ build/native/nativeCompile/crfa-metadata-service-reloaded
+$ build/native/nativeCompile/crfa-dapp-registration-and-certification-service
 ```
 
 ## Create docker image
@@ -25,7 +25,7 @@ $ ./gradlew bootBuildImage
 and then run via
  
 ```
-$ docker run --rm -p 8080:8080 crfa-metadata-service-reloaded:0.0.1-SNAPSHOT
+$ docker run --rm -p 8080:8080 crfa-dapp-registration-and-certification-service:0.0.1-SNAPSHOT
 ```
 
 ## Design
