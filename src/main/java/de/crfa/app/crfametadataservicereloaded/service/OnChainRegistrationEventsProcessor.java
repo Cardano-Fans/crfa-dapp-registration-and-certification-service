@@ -76,26 +76,19 @@ public class OnChainRegistrationEventsProcessor {
                         var onChainDappRegistrationEvent = new OnChainDappRegistrationEvent();
                         var id = new OnChainDappRegistrationEventId(slot, blockHash, subject);
 
+                        JsonNode typeNode = root.get("type");
+
+                        JsonNode signature = root.get("signature");
+
                         onChainDappRegistrationEvent.setId(id);
                         onChainDappRegistrationEvent.setRootHash(root.get("rootHash").asText());
 
-                        JsonNode typeNode = root.get("type");
-
                         onChainDappRegistrationEvent.setActionType(ActionType.valueOf(typeNode.get("action").asText()));
-
-                        if (typeNode.has("releaseNumber")) {
-                            onChainDappRegistrationEvent.setReleaseNumber(typeNode.get("releaseNumber").asText());
-                        }
-                        if (typeNode.has("releaseName")) {
-                            onChainDappRegistrationEvent.setReleaseName(typeNode.get("releaseName").asText());
-                        }
-
-                        JsonNode signature = root.get("signature");
+                        onChainDappRegistrationEvent.setMetadataUrls(convertUrls(root));
 
                         onChainDappRegistrationEvent.setSignatureS(signature.get("s").asText());
                         onChainDappRegistrationEvent.setSignatureR(signature.get("r").asText());
                         onChainDappRegistrationEvent.setSignaturePub(signature.get("pub").asText());
-                        onChainDappRegistrationEvent.setMetadataUrls(convertUrls(root));
 
                         dappRegistrationEventRepository.saveAndFlush(onChainDappRegistrationEvent);
 
